@@ -32,7 +32,29 @@ router.get('/orders', async (req, res) => {
             }
         }
 
-        res.json(orders);
+        // NORMALIZE: Transform backend data to match frontend expectations
+        const normalizedOrders = orders.map(order => {
+            // Calculate total price from fulfilment items
+            const totalPrice = order.fulfilment_items.reduce((sum, item) => {
+                return sum + (parseFloat(item.qty || 1) * 50.00); // Temporary calculation
+            }, 0);
+
+            return {
+                shopify_order_id: order.order_id,
+                order_number: order.order_id,
+                created_at_shopify: order.created_at,
+                financial_status: order.status || 'unknown',
+                total_price: totalPrice.toFixed(2),
+                line_items: order.fulfilment_items.map(item => ({
+                    image_url: item.image_url || 'https://via.placeholder.com/60',
+                    title: item.reason || 'Product Item', // Using reason field as title temporarily
+                    quantity: item.qty || 1,
+                    price: '50.00' // Temporary - should be calculated/stored properly
+                }))
+            };
+        });
+
+        res.json(normalizedOrders);
     } catch (error) {
         console.error('Error fetching orders from DB:', error);
         res.status(500).send('Error fetching orders');
@@ -139,10 +161,12 @@ async function saveOrderData(shop, orderData, fromGraphql = false) {
         [order.shop, order.order_id, order.status, order.created_at]
     );
 
-    // Save line items as 'fulfilment_items' - FIXED: Include reason field
+    // Save line items as 'fulfilment_items' with more detailed data
     for (const item of lineItems) {
-        const imageUrl = fromGraphql ? item.variant?.image?.url : null;
+        const imageUrl = fromGraphql ? item.variant?.image?.url : (item.image ? item.image.src : null);
         const lineItemId = fromGraphql ? item.legacyResourceId : item.id;
+        const title = item.title || 'Product Item';
+        const price = fromGraphql ? (item.variant?.price || '0.00') : (item.price || '0.00');
 
         const fiResult = await db.query(
             `INSERT INTO fulfilment_items (order_id, line_item_id, qty, reason, image_url)
@@ -153,12 +177,12 @@ async function saveOrderData(shop, orderData, fromGraphql = false) {
                reason = EXCLUDED.reason,
                image_url = EXCLUDED.image_url
              RETURNING id`,
-             [order.order_id, lineItemId, item.quantity, 'order_item', imageUrl]
+             [order.order_id, lineItemId, item.quantity, title, imageUrl] // Store title as reason temporarily
         );
         
         // Save images to 'images' table
         if (imageUrl && fiResult.rows.length > 0) {
-            const returnItemId = fiResult.rows[0].id; // Use fulfilment_item id
+            const returnItemId = fiResult.rows[0].id;
             await db.query(
                 `INSERT INTO images (image_url, return_item_id)
                  VALUES ($1, $2)
