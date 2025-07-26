@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderList = document.getElementById('order-list');
     const loader = document.getElementById('loader');
     const errorMessage = document.getElementById('error-message');
+    const installPrompt = document.getElementById('install-prompt');
     const modal = document.getElementById('order-modal');
     const modalBody = document.getElementById('modal-body');
     const closeButton = document.querySelector('.close-button');
@@ -13,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const shop = urlParams.get('shop');
 
     if (!shop) {
-        errorMessage.textContent = 'Shop parameter is missing. Please install the app correctly.';
-        errorMessage.style.display = 'block';
+        installPrompt.style.display = 'block';
         loader.style.display = 'none';
         return;
     }

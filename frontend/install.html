@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install Shopify Order Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .install-container {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .install-form {
+            margin-top: 30px;
+        }
+        .shop-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .install-btn {
+            width: 100%;
+            padding: 12px;
+            background: #5865f2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .install-btn:hover {
+            background: #4752c4;
+        }
+        .help-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="install-container">
+        <h1>Shopify Order Dashboard</h1>
+        <p>Install this app to view your store's order data from the last 60 days.</p>
+        
+        <form class="install-form" onsubmit="installApp(event)">
+            <input 
+                type="text" 
+                class="shop-input" 
+                placeholder="your-shop-name.myshopify.com" 
+                id="shop-input"
+                required
+                pattern="[a-zA-Z0-9\-]+\.myshopify\.com"
+                title="Please enter a valid Shopify store URL (e.g., your-shop.myshopify.com)"
+            >
+            <button type="submit" class="install-btn">Install App</button>
+        </form>
+        
+        <div class="help-text">
+            <p>Enter your Shopify store URL to begin the installation process.</p>
+            <p>You'll be redirected to Shopify to authorize the app.</p>
+        </div>
+    </div>
+
+    <script>
+        function installApp(event) {
+            event.preventDefault();
+            const shopInput = document.getElementById('shop-input');
+            const shop = shopInput.value.trim();
+            
+            if (!shop) {
+                alert('Please enter your shop domain');
+                return;
+            }
+            
+            // Redirect to the install endpoint
+            window.location.href = `/install?shop=${shop}`;
+        }
+    </script>
+</body>
+</html>

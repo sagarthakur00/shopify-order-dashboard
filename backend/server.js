@@ -20,6 +20,11 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/', authRoutes);
 app.use('/api', apiRoutes);
 
+// A route to serve the install page specifically
+app.get('/install.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/install.html'));
+});
+
 // A catch-all to redirect to the main app page
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));

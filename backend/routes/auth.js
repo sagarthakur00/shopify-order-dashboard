@@ -15,12 +15,12 @@ router.get('/install', (req, res) => {
         return res.status(400).send('Missing shop parameter');
     }
 
-    const installUrl = `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${SCOPES}&redirect_uri=${HOST}/auth/callback`;
+    const installUrl = `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${SCOPES}&redirect_uri=${HOST}/callback`;
     res.redirect(installUrl);
 });
 
 // Route for the OAuth callback
-router.get('/auth/callback', async (req, res) => {
+router.get('/callback', async (req, res) => {
     const { shop, hmac, code } = req.query;
 
     if (!shop || !hmac || !code) {
