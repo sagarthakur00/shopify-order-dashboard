@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Order Dashboard</h1>
+        <p>Viewing last 60 days of orders</p>
+    </header>
+
+    <main>
+        <div id="loader" class="loader"></div>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="order-list-container">
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Date</th>
+                        <th>Payment Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="order-list">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Order Details</h2>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
