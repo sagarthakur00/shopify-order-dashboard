@@ -296,4 +296,58 @@ async function saveOrderData(shop, orderData, fromGraphql = false) {
     }
 }
 
+// Test route to manually register webhook
+router.get('/test-webhook-register', async (req, res) => {
+  const { shop } = req.query;
+  if (!shop) {
+    return res.status(400).send('Missing shop parameter');
+  }
+
+  try {
+    const result = await db.query('SELECT access_token FROM shops WHERE shop_domain = $1', [shop]);
+    if (result.rows.length === 0) {
+      return res.status(404).send('Shop not found in DB');
+    }
+
+    const accessToken = result.rows[0].access_token;
+
+    await registerOrderWebhook(shop, accessToken);
+
+    res.send('✅ Webhook registered successfully');
+  } catch (err) {
+    console.error('Webhook test error:', err);
+    res.status(500).send('Webhook registration failed: ' + err.message);
+  }
+});
+
+// Helper function to register order creation webhook (for testing)
+async function registerOrderWebhook(shop, accessToken) {
+    const webhookUrl = `${process.env.HOST}/api/webhooks/orders/create`;
+    const webhookEndpoint = `https://${shop}/admin/api/2024-07/webhooks.json`;
+
+    console.log('🔗 Registering webhook:', webhookUrl);
+    console.log('🏪 For shop:', shop);
+
+    try {
+        const response = await axios.post(
+            webhookEndpoint,
+            {
+                webhook: {
+                    topic: 'orders/create',
+                    address: webhookUrl,
+                    format: 'json',
+                },
+            },
+            {
+                headers: { 'X-Shopify-Access-Token': accessToken },
+            }
+        );
+        console.log('✅ Webhook registered successfully:', response.data);
+        console.log(`Webhook for orders/create registered successfully for ${shop}`);
+    } catch (error) {
+        console.error('❌ Error registering webhook:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+}
+
 module.exports = router;
