@@ -15,7 +15,15 @@ router.get('/install', (req, res) => {
         return res.status(400).send('Missing shop parameter');
     }
 
-    const installUrl = `https://${shop}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${SCOPES}&redirect_uri=${HOST}/callback`;
+    // Ensure shop includes .myshopify.com
+    const shopDomain = shop.includes('.myshopify.com') ? shop : `${shop}.myshopify.com`;
+    
+    const installUrl = `https://${shopDomain}/admin/oauth/authorize?client_id=${SHOPIFY_API_KEY}&scope=${SCOPES}&redirect_uri=${HOST}/callback`;
+    
+    console.log('🔗 Install URL generated:', installUrl);
+    console.log('🏪 Shop domain:', shopDomain);
+    console.log('🏠 HOST env var:', HOST);
+    
     res.redirect(installUrl);
 });
 

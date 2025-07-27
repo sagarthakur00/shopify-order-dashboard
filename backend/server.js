@@ -20,6 +20,12 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.use('/', authRoutes);
 app.use('/api', apiRoutes);
 
+// Add redirect route for /install (without .html)
+app.get('/install', (req, res) => {
+  const queryString = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+  res.redirect('/install.html' + queryString);
+});
+
 // A route to serve the install page specifically
 app.get('/install.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/install.html'));
